@@ -1,0 +1,39 @@
+#include <WiFi.h>
+#include <UniversalEmail.h>
+//CONFIGURAÇÕES DE CONSTANTES WIFI E SMTP PARA EMAIL
+const char* ssid = "NomeSenhaWIFI";
+const char* password = "senhates123";
+const char* smtpServer = "smtp.gmail.com";
+const uint16_t smtpPort = 465;
+const char* username = "davislessa@gmail.com";
+const char* passwordEmail = "senhateste123";
+
+// PINOS PARA CONECTAR O SENSOR DE MOVIMENTO
+const int sensorPin = 4;
+
+// BIBLIOTECAS
+WiFiClientSecure client;
+UniversalEmail email(smtpServer, smtpPort, username, passwordEmail, client);
+
+//CONFIGURAÇÕES SERIAL E INICIALIZAÇÃO
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("WiFi connected");
+  Serial.println(WiFi.localIP());
+}
+
+//LOOP DE VERIFICAÇÃO DO SENSOR E ENVIO DE EMAIL
+void loop() {
+  int sensorValue = digitalRead(sensorPin);
+  if (sensorValue == HIGH) {
+    Serial.println("Movimento detectado!");
+    // Enviar notificação por e-mail
+    email.sendMail("seu_email@gmail.com", "Alerta de Movimento", "Movimento detectado!");
+    delay(300000); // PAUSA DE 5 MINUTOS DEPOIS DE ENVIAR EMAIL
+  }
+}
